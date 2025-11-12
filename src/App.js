@@ -62,15 +62,15 @@ function App() {
                   <li><Link className="dropdown-item" to="/units">Units</Link></li>
                   <li><Link className="dropdown-item" to="/voucher-types">Voucher Types</Link></li>
                   <li><Link className="dropdown-item" to="/budgets">Budgets</Link></li>
-                  <li><Link className="dropdown-item" to="/currency">Currency</Link></li>
+                  {/* <li><Link className="dropdown-item" to="/currency">Currency</Link></li> */}
                 </ul>
               </li>
 
               {/* Inventory Dropdown */}
               <li className="nav-item dropdown">
                 <a
-                  className="nav-link dropdown-toggle"
                   href="#"
+                  className="nav-link dropdown-toggle"
                   id="inventoryDropdown"
                   role="button"
                   data-bs-toggle="dropdown"
