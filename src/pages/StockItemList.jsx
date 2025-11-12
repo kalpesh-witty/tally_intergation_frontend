@@ -4,28 +4,31 @@ import { apiUrl } from "../helper";
 
 function StockItemList() {
   const [list, setList] = useState([]);
-  const [unit, setUnit] = useState([]);
+  const [units, setUnits] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     baseUnits: "",
     openingBalance: "",
     hsnCode: "",
-    gstRate: ""
+    gstRate: "",
   });
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch stock items
+  // Load Stock Items
   const loadStockItems = () => {
-    axios.get(`${apiUrl}/stock-items`)
-      .then(res => setList(res.data.stockItems))
-      .catch(err => console.error("Failed to load stock items", err));
+    axios
+      .get(`${apiUrl}/stock-items`)
+      .then((res) => setList(res.data.stockItems || []))
+      .catch((err) => console.error("Failed to load stock items", err));
   };
 
+  // Load Units
   const loadUnits = () => {
-    axios.get(`${apiUrl}/units`)
-      .then(res => setUnit(res.data.units))
-      .catch(err => console.error("Failed to load units", err));
+    axios
+      .get(`${apiUrl}/units`)
+      .then((res) => setUnits(res.data.units || []))
+      .catch((err) => console.error("Failed to load units", err));
   };
 
   useEffect(() => {
@@ -33,29 +36,29 @@ function StockItemList() {
     loadStockItems();
   }, []);
 
-  // Handle form input changes
-  const handleChange = (e) => {
+  // Handle Form Changes
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
-  // Handle submit (create new stock item)
+  // Handle Create Stock Item
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!formData.name.trim()) return alert("Please enter stock item name");
 
-    if (!formData.name.trim()) {
-      alert("Please enter Stock Item Name");
-      return;
-    }
-
-    const confirmCreate = window.confirm(`Create new stock item "${formData.name}"?`);
-    if (!confirmCreate) return;
+    if (!window.confirm(`Create new stock item "${formData.name}"?`)) return;
 
     setLoading(true);
     try {
       await axios.post(`${apiUrl}/create-stock-item`, formData);
-      alert("Stock Item created successfully!");
-      setFormData({ name: "", baseUnits: "", openingBalance: "", hsnCode: "", gstRate: "" });
-      loadStockItems(); // Refresh list
+      alert("Stock item created successfully!");
+      setFormData({
+        name: "",
+        baseUnits: "",
+        openingBalance: "",
+        hsnCode: "",
+        gstRate: "",
+      });
+      loadStockItems();
     } catch (err) {
       console.error(err);
       alert("Failed to create stock item");
@@ -64,15 +67,14 @@ function StockItemList() {
     }
   };
 
-  // Handle delete
+  // Handle Delete
   const handleDelete = async (name) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
-    if (!confirmDelete) return;
+    if (!window.confirm(`Are you sure you want to delete "${name}"?`)) return;
 
     setDeleting(true);
     try {
       const res = await axios.post(`${apiUrl}/delete-stock-item`, { name });
-      alert(res.data?.message || "Stock Item deleted successfully!");
+      alert(res.data?.message || "Stock item deleted successfully!");
       loadStockItems();
     } catch (err) {
       console.error(err);
@@ -83,106 +85,162 @@ function StockItemList() {
   };
 
   return (
-    <>
-      <h2>Stock Item List</h2>
+    <div className="container mt-4">
+      <h3 className="fw-bold text-primary mb-4">Stock Item Management</h3>
 
       {/* Create Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Stock Item Name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          disabled={loading}
-        />
-        <select
-          name="baseUnits"
-          value={formData.baseUnits}
-          onChange={handleChange}
-          required
-          disabled={loading}
-        >
-          <option value="">-- Select Base Unit --</option>
-          {unit.map((unit, idx) => (
-            <option key={idx} value={unit}>{unit}</option>
-          ))}
-        </select>
-        <input
-          type="number"
-          name="openingBalance"
-          placeholder="Opening Balance"
-          value={formData.openingBalance}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <input
-          type="text"
-          name="hsnCode"
-          placeholder="HSN Code"
-          value={formData.hsnCode}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <input
-          type="number"
-          name="gstRate"
-          placeholder="GST % (e.g. 18)"
-          value={formData.gstRate}
-          onChange={handleChange}
-          disabled={loading}
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Stock Item"}
-        </button>
+      <form
+        onSubmit={handleSubmit}
+        className="p-3 border rounded bg-light shadow-sm mb-4"
+      >
+        <div className="row g-3 align-items-center">
+          <div className="col-md-3">
+            <input
+              type="text"
+              name="name"
+              className="form-control"
+              placeholder="Stock Item Name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            />
+          </div>
+
+          <div className="col-md-2">
+            <select
+              name="baseUnits"
+              className="form-select"
+              value={formData.baseUnits}
+              onChange={handleChange}
+              required
+              disabled={loading}
+            >
+              <option value="">-- Base Unit --</option>
+              {units.map((u, idx) => (
+                <option key={idx} value={u}>
+                  {u}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="col-md-2">
+            <input
+              type="number"
+              name="openingBalance"
+              className="form-control"
+              placeholder="Opening Qty"
+              value={formData.openingBalance}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="col-md-2">
+            <input
+              type="text"
+              name="hsnCode"
+              className="form-control"
+              placeholder="HSN Code"
+              value={formData.hsnCode}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="col-md-2">
+            <input
+              type="number"
+              name="gstRate"
+              className="form-control"
+              placeholder="GST %"
+              value={formData.gstRate}
+              onChange={handleChange}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="col-md-1">
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  Saving
+                </>
+              ) : (
+                "Save"
+              )}
+            </button>
+          </div>
+        </div>
       </form>
 
       {/* Stock Item Table */}
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse", width: "100%" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Stock Item Name</th>
-            <th>Under</th>
-            <th>Unit</th>
-            <th>Opening Qty</th>
-            <th>Rate</th>
-            <th>GST Applicable</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list?.length > 0 ? (
-            list.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l?.name}</td>
-                <td>{l?.parent}</td>
-                <td>{l?.baseUnits}</td>
-                <td>{l?.openingBalance}</td>
-                <td>0.00</td>
-                <td>{l?.gstApplicable}</td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(l?.name)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-dark">
+            <tr>
+              <th style={{ width: "5%" }}>#</th>
+              <th>Name</th>
+              <th>Under</th>
+              <th>Unit</th>
+              <th>Opening Qty</th>
+              <th>Rate</th>
+              <th>GST Applicable</th>
+              <th style={{ width: "10%" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list?.length > 0 ? (
+              list.map((l, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{l?.name}</td>
+                  <td>{l?.parent || "-"}</td>
+                  <td>{l?.baseUnits || "-"}</td>
+                  <td>{l?.openingBalance || "0"}</td>
+                  <td>0.00</td>
+                  <td>{l?.gstApplicable || "Applicable"}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDelete(l?.name)}
+                      disabled={deleting}
+                    >
+                      {deleting ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-1"
+                            role="status"
+                          ></span>
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="8" className="text-center text-muted py-3">
+                  No Stock Items Found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="8" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

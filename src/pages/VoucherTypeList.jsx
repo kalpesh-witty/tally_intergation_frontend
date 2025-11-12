@@ -3,73 +3,69 @@ import axios from "axios";
 import { apiUrl } from "../helper";
 
 function VoucherTypeList() {
-  const [lits, setList] = useState([]);
-  // const [deleting, setDeleting] = useState(false);
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const loadVocherType = () => {
-    axios.get(`${apiUrl}/voucher-types`)
-      .then(res => setList(res.data.voucherTypes))
-      .catch(err => console.error("Failed to load voucher-types", err));
+  // Fetch voucher types
+  const loadVoucherTypes = () => {
+    setLoading(true);
+    axios
+      .get(`${apiUrl}/voucher-types`)
+      .then((res) => setList(res.data.voucherTypes || []))
+      .catch((err) => console.error("Failed to load voucher types", err))
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {
-    loadVocherType();
+    loadVoucherTypes();
   }, []);
 
-  // Handle delete
-  // const handleDelete = async (name) => {
-  //   const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
-  //   if (!confirmDelete) return;
-  //   setDeleting(true);
-  //   try {
-  //     const res = await axios.post(`${apiUrl}/delete-voucher-type`, { name });
-  //     alert(res.data?.message || "Voucher Type deleted successfully!");
-  //     loadVocherType();
-  //   } catch (err) {
-  //     console.error(err);
-  //     alert("Failed to delete Voucher Type");
-  //   } finally {
-  //     setDeleting(false);
-  //   }
-  // };
-
   return (
-    <>
-      <h2>Voucher Type List</h2>
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Voucher Type Name</th>
-            {/* <th>Action</th> */}
-          </tr>
-        </thead>
-        <tbody>
-          {lits?.length > 0 ? (
-            lits.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l?.name}</td>
-                {/* <td>
-                  <button
-                    onClick={() => handleDelete(l?.name)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
-                </td> */}
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="2" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+    <div className="container mt-4">
+      <h3 className="fw-bold text-primary mb-4">Voucher Type List</h3>
+
+      {/* Table */}
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-dark">
+                <tr>
+                  <th style={{ width: "5%" }}>#</th>
+                  <th>Voucher Type Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan="2" className="text-center py-4">
+                      <div
+                        className="spinner-border text-primary"
+                        role="status"
+                      ></div>
+                      <div className="mt-2 text-muted">Loading...</div>
+                    </td>
+                  </tr>
+                ) : list?.length > 0 ? (
+                  list.map((l, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{l?.name}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="2" className="text-center text-muted py-3">
+                      No Voucher Types Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

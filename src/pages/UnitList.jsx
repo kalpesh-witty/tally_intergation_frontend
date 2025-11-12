@@ -10,16 +10,17 @@ function UnitList() {
 
   // Fetch Units
   const loadUnits = () => {
-    axios.get(`${apiUrl}/units`)
-      .then(res => setUnits(res.data.units))
-      .catch(err => console.error("Failed to load units", err));
+    axios
+      .get(`${apiUrl}/units`)
+      .then((res) => setUnits(res.data.units))
+      .catch((err) => console.error("Failed to load units", err));
   };
 
   useEffect(() => {
     loadUnits();
   }, []);
 
-  // Create Unit with Confirmation
+  // Create Unit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -28,96 +29,130 @@ function UnitList() {
       return;
     }
 
-    const confirmCreate = window.confirm(`Are you sure you want to create unit "${name}"?`);
-    if (!confirmCreate) return;
+    if (!window.confirm(`Create new unit "${name}"?`)) return;
 
     setLoading(true);
-
     try {
       await axios.post(`${apiUrl}/create-unit`, { name });
       alert("Unit created successfully!");
       setName("");
-      loadUnits();    // Refresh list after creating
+      loadUnits();
     } catch (err) {
-      alert("Failed to create unit");
       console.error(err);
+      alert("Failed to create unit");
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle delete
-  const handleDelete = async (name) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
-    if (!confirmDelete) return;
+  // Delete Unit
+  const handleDelete = async (unitName) => {
+    if (!window.confirm(`Delete unit "${unitName}"?`)) return;
+
     setDeleting(true);
     try {
-      const res = await axios.post(`${apiUrl}/delete-unit`, { name });
+      const res = await axios.post(`${apiUrl}/delete-unit`, { name: unitName });
       alert(res.data?.message || "Unit deleted successfully!");
       loadUnits();
     } catch (err) {
       console.error(err);
-      alert("Failed to delete Unit");
+      alert("Failed to delete unit");
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <>
-      <h2>Units List</h2>
+    <div className="container mt-4">
+      <h3 className="text-primary fw-bold mb-4">Unit Management</h3>
 
       {/* Create Unit Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Unit Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Unit"}
-        </button>
+      <form
+        onSubmit={handleSubmit}
+        className="p-3 mb-4 border rounded bg-light shadow-sm"
+      >
+        <div className="row g-3 align-items-center">
+          <div className="col-md-6">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter Unit Name (e.g., Nos, Kg)"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </div>
+          <div className="col-md-3">
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  Creating...
+                </>
+              ) : (
+                "Create Unit"
+              )}
+            </button>
+          </div>
+        </div>
       </form>
 
       {/* Units Table */}
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Unit Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {units?.length > 0 ? (
-            units.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l}</td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(l)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-dark">
+            <tr>
+              <th style={{ width: "5%" }}>#</th>
+              <th>Unit Name</th>
+              <th style={{ width: "15%" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {units?.length > 0 ? (
+              units.map((u, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{u}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDelete(u)}
+                      disabled={deleting}
+                    >
+                      {deleting ? (
+                        <>
+                          <span
+                            className="spinner-border spinner-border-sm me-1"
+                            role="status"
+                          ></span>
+                          Deleting...
+                        </>
+                      ) : (
+                        "Delete"
+                      )}
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="3" className="text-center text-muted py-3">
+                  No Data Found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="2" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

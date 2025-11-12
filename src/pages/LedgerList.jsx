@@ -4,14 +4,14 @@ import { apiUrl } from "../helper";
 
 function LedgerList() {
   const [ledgers, setLedgers] = useState([]);
-  const [groups, setGroups] = useState([]); // ← ledger groups list
+  const [groups, setGroups] = useState([]);
   const [ledgerName, setLedgerName] = useState("");
-  const [parent, setParent] = useState(""); // ← selected group
+  const [parent, setParent] = useState("");
   const [editLedger, setEditLedger] = useState(null);
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Fetch Ledgers
+  // Load Ledgers
   const loadLedgers = () => {
     axios
       .get(`${apiUrl}/ledgers`)
@@ -19,7 +19,7 @@ function LedgerList() {
       .catch((err) => console.error("Failed to load ledgers", err));
   };
 
-  // Fetch Groups (Ledger Parents)
+  // Load Ledger Groups
   const loadGroups = () => {
     axios
       .get(`${apiUrl}/ledger-groups`)
@@ -32,30 +32,24 @@ function LedgerList() {
     loadGroups();
   }, []);
 
-  // Create or Update Ledger
+  // Create / Update Ledger
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!ledgerName.trim()) {
-      alert("Please enter ledger name");
-      return;
-    }
-    if (!parent.trim()) {
-      alert("Please select a ledger group");
+    if (!ledgerName.trim() || !parent.trim()) {
+      alert("Please fill all fields");
       return;
     }
 
     const isEdit = !!editLedger;
     const confirmMsg = isEdit
-      ? `Update ledger "${editLedger}" with name "${ledgerName}" and group "${parent}"?`
-      : `Create new ledger "${ledgerName}" under group "${parent}"?`;
+      ? `Update ledger "${editLedger}" to "${ledgerName}" under "${parent}"?`
+      : `Create new ledger "${ledgerName}" under "${parent}"?`;
 
     if (!window.confirm(confirmMsg)) return;
     setLoading(true);
 
     try {
       if (isEdit) {
-        // UPDATE API
         await axios.post(`${apiUrl}/update-ledger`, {
           oldName: editLedger,
           newName: ledgerName,
@@ -63,7 +57,6 @@ function LedgerList() {
         });
         alert("Ledger updated successfully!");
       } else {
-        // CREATE API
         await axios.post(`${apiUrl}/create-ledger`, { ledgerName, parent });
         alert("Ledger created successfully!");
       }
@@ -86,8 +79,8 @@ function LedgerList() {
 
     setDeleting(true);
     try {
-      const res = await axios.post(`${apiUrl}/delete-ledger`, { name });
-      alert(res.data?.message || "Ledger deleted successfully!");
+      await axios.post(`${apiUrl}/delete-ledger`, { name });
+      alert("Ledger deleted successfully!");
       loadLedgers();
     } catch (err) {
       console.error(err);
@@ -111,100 +104,137 @@ function LedgerList() {
   };
 
   return (
-    <>
-      <h2>Ledger List</h2>
+    <div className="container mt-4">
+      <h3 className="text-primary fw-bold mb-4">Ledger Management</h3>
 
-      {/* Ledger Create / Edit Form */}
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Ledger Name"
-          value={ledgerName}
-          onChange={(e) => setLedgerName(e.target.value)}
-          disabled={loading}
-          required
-        />
+      {/* Form */}
+      <form
+        onSubmit={handleSubmit}
+        className="p-3 mb-4 border rounded bg-light shadow-sm"
+      >
+        <div className="row g-3 align-items-center">
+          <div className="col-md-4">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Ledger Name"
+              value={ledgerName}
+              onChange={(e) => setLedgerName(e.target.value)}
+              disabled={loading}
+              required
+            />
+          </div>
 
-        <select
-          value={parent}
-          onChange={(e) => setParent(e.target.value)}
-          disabled={loading}
-          required
-          style={{ marginLeft: "10px" }}
-        >
-          <option value="">-- Select Ledger Group --</option>
-          {groups.map((g, idx) => (
-            <option key={idx} value={g.name}>
-              {g.name} {g.parent ? `(${g.parent})` : ""}
-            </option>
-          ))}
-        </select>
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={parent}
+              onChange={(e) => setParent(e.target.value)}
+              disabled={loading}
+              required
+            >
+              <option value="">-- Select Ledger Group --</option>
+              {groups.map((g, idx) => (
+                <option key={idx} value={g.name}>
+                  {g.name} {g.parent ? `(${g.parent})` : ""}
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <button type="submit" disabled={loading} style={{ marginLeft: "10px" }}>
-          {loading
-            ? editLedger
-              ? "Updating..."
-              : "Creating..."
-            : editLedger
-            ? "Update Ledger"
-            : "Create Ledger"}
-        </button>
+          <div className="col-md-4 d-flex gap-2">
+            <button
+              type="submit"
+              className={`btn ${editLedger ? "btn-warning" : "btn-primary"} w-100`}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                  ></span>
+                  {editLedger ? "Updating..." : "Creating..."}
+                </>
+              ) : editLedger ? (
+                "Update Ledger"
+              ) : (
+                "Create Ledger"
+              )}
+            </button>
 
-        {editLedger && (
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-            style={{ marginLeft: "10px" }}
-          >
-            Cancel
-          </button>
-        )}
+            {editLedger && (
+              <button
+                type="button"
+                className="btn btn-secondary w-100"
+                onClick={handleCancelEdit}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+        </div>
       </form>
 
       {/* Ledger Table */}
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Ledger Name</th>
-            <th>Group</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {ledgers?.length > 0 ? (
-            ledgers.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l.name}</td>
-                <td>{l.parent || "-"}</td>
-                <td>
-                  <button
-                    onClick={() => handleEdit(l)}
-                    disabled={loading || deleting}
-                  >
-                    Edit
-                  </button>{" "}
-                  <button
-                    onClick={() => handleDelete(l.name)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover align-middle">
+          <thead className="table-dark">
+            <tr>
+              <th style={{ width: "5%" }}>#</th>
+              <th>Ledger Name</th>
+              <th>Group</th>
+              <th style={{ width: "20%" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ledgers?.length > 0 ? (
+              ledgers.map((l, idx) => (
+                <tr key={idx}>
+                  <td>{idx + 1}</td>
+                  <td>{l.name}</td>
+                  <td>{l.parent || "-"}</td>
+                  <td>
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-sm btn-outline-primary"
+                        onClick={() => handleEdit(l)}
+                        disabled={loading || deleting}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-sm btn-danger"
+                        onClick={() => handleDelete(l.name)}
+                        disabled={deleting}
+                      >
+                        {deleting ? (
+                          <>
+                            <span
+                              className="spinner-border spinner-border-sm me-1"
+                              role="status"
+                            ></span>
+                            Deleting...
+                          </>
+                        ) : (
+                          "Delete"
+                        )}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="text-center text-muted py-3">
+                  No Data Found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="4" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

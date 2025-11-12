@@ -3,35 +3,37 @@ import axios from "axios";
 import { apiUrl } from "../helper";
 
 function EmployeeCategoriesList() {
-  const [list, setList] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // 🔹 Load all Godowns
+  // 🔹 Load Employee Categories
   const loadCategories = () => {
     axios
       .get(`${apiUrl}/employee-categories`)
-      .then((res) => setList(res.data.employeeCategories))
-      .catch((err) => console.error("Failed to load Employee Categories", err));
+      .then((res) => setCategories(res.data.employeeCategories || []))
+      .catch((err) =>
+        console.error("Failed to load Employee Categories", err)
+      );
   };
 
   useEffect(() => {
     loadCategories();
   }, []);
 
-  // 🔹 Create new Godown
+  // 🔹 Create New Category
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Please enter a Employee Category name");
+      alert("Please enter an Employee Category name");
       return;
     }
 
     const confirmCreate = window.confirm(
-      `Are you sure you want to create Employee Category "${name}"?`
+      `Create Employee Category "${name}" under "${parentName || "Primary"}"?`
     );
     if (!confirmCreate) return;
 
@@ -54,13 +56,17 @@ function EmployeeCategoriesList() {
     }
   };
 
-  // Handle delete
+  // 🔹 Delete Category
   const handleDelete = async (name) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
+    const confirmDelete = window.confirm(
+      `Are you sure you want to delete "${name}"?`
+    );
     if (!confirmDelete) return;
     setDeleting(true);
     try {
-      const res = await axios.post(`${apiUrl}/delete-employee-category`, { name });
+      const res = await axios.post(`${apiUrl}/delete-employee-category`, {
+        name,
+      });
       alert(res.data?.message || "Employee Category deleted successfully!");
       loadCategories();
     } catch (err) {
@@ -72,57 +78,77 @@ function EmployeeCategoriesList() {
   };
 
   return (
-    <>
-      <h2>Employee Category List</h2>
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Employee Category Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Employee Category"}
-        </button>
+    <div className="container mt-4">
+      <h3 className="fw-bold text-primary mb-4">Employee Category List</h3>
+
+      {/* 🔹 Create Form */}
+      <form onSubmit={handleSubmit} className="row g-2 align-items-center mb-4">
+        <div className="col-md-10">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Employee Category Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+        <div className="col-md-2">
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={loading}
+          >
+            {loading ? "Creating..." : "Create Category"}
+          </button>
+        </div>
       </form>
 
-      {/* 🔹 Godown Table */}
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list?.length > 0 ? (
-            list.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l?.name}</td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(l?.name)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+      {/* 🔹 Table */}
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-dark">
+                <tr>
+                  <th style={{ width: "5%" }}>#</th>
+                  <th>Name</th>
+                  <th>Under</th>
+                  <th style={{ width: "10%" }}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories?.length > 0 ? (
+                  categories.map((cat, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{cat?.name}</td>
+                      <td>{cat?.parentName || "Primary"}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDelete(cat?.name)}
+                          disabled={deleting}
+                        >
+                          {deleting ? "Deleting..." : "Delete"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center text-muted py-3">
+                      No Employee Categories Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

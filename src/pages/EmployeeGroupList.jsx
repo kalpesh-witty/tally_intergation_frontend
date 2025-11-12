@@ -3,35 +3,35 @@ import axios from "axios";
 import { apiUrl } from "../helper";
 
 function EmployeeGroupList() {
-  const [list, setList] = useState([]);
+  const [groups, setGroups] = useState([]);
   const [name, setName] = useState("");
   const [parentName, setParentName] = useState("");
   const [loading, setLoading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // 🔹 Load all Godowns
-  const loadCategories = () => {
+  // 🔹 Load Employee Groups
+  const loadGroups = () => {
     axios
       .get(`${apiUrl}/employee-groups`)
-      .then((res) => setList(res.data.groups))
-      .catch((err) => console.error("Failed to load Employee groups", err));
+      .then((res) => setGroups(res.data.groups || []))
+      .catch((err) => console.error("Failed to load Employee Groups", err));
   };
 
   useEffect(() => {
-    loadCategories();
+    loadGroups();
   }, []);
 
-  // 🔹 Create new Godown
+  // 🔹 Create New Group
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!name.trim()) {
-      alert("Please enter a Employee Group name");
+      alert("Please enter Employee Group name");
       return;
     }
 
     const confirmCreate = window.confirm(
-      `Are you sure you want to create Employee Group "${name}"?`
+      `Create Employee Group "${name}" under "${parentName || "Primary"}"?`
     );
     if (!confirmCreate) return;
 
@@ -45,7 +45,7 @@ function EmployeeGroupList() {
       alert(res.data.message || "Employee Group created successfully!");
       setName("");
       setParentName("");
-      loadCategories();
+      loadGroups();
     } catch (err) {
       console.error(err);
       alert("Failed to create Employee Group");
@@ -54,7 +54,7 @@ function EmployeeGroupList() {
     }
   };
 
-  // Handle delete
+  // 🔹 Delete Group
   const handleDelete = async (name) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
     if (!confirmDelete) return;
@@ -62,7 +62,7 @@ function EmployeeGroupList() {
     try {
       const res = await axios.post(`${apiUrl}/delete-employee-category`, { name });
       alert(res.data?.message || "Employee Group deleted successfully!");
-      loadCategories();
+      loadGroups();
     } catch (err) {
       console.error(err);
       alert("Failed to delete Employee Group");
@@ -72,57 +72,75 @@ function EmployeeGroupList() {
   };
 
   return (
-    <>
-      <h2>Employee Group List</h2>
-      <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-        <input
-          type="text"
-          placeholder="Employee Group Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          disabled={loading}
-          required
-        />
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Employee Group"}
-        </button>
+    <div className="container mt-4">
+      <h3 className="fw-bold text-primary mb-4">Employee Group List</h3>
+
+      {/* 🔹 Create Employee Group Form */}
+      <form onSubmit={handleSubmit} className="row g-2 align-items-center mb-4">
+        <div className="col-md-10">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Employee Group Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+        <div className="col-md-2">
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={loading}
+          >
+            {loading ? "Creating..." : "Create Group"}
+          </button>
+        </div>
       </form>
 
-      {/* 🔹 Godown Table */}
-      <table border="1" cellPadding="10" style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list?.length > 0 ? (
-            list.map((l, idx) => (
-              <tr key={idx}>
-                <td>{idx + 1}</td>
-                <td>{l?.name}</td>
-                <td>
-                  <button
-                    onClick={() => handleDelete(l?.name)}
-                    disabled={deleting}
-                  >
-                    {deleting ? "Deleting..." : "Delete"}
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="3" style={{ textAlign: "center", padding: "10px" }}>
-                No Data Found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </>
+      {/* 🔹 Group Table */}
+      <div className="card shadow-sm">
+        <div className="card-body">
+          <div className="table-responsive">
+            <table className="table table-bordered table-hover align-middle">
+              <thead className="table-dark">
+                <tr>
+                  <th style={{ width: "5%" }}>#</th>
+                  <th>Name</th>
+                  <th style={{width:"100px"}}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {groups?.length > 0 ? (
+                  groups.map((g, idx) => (
+                    <tr key={idx}>
+                      <td>{idx + 1}</td>
+                      <td>{g?.name}</td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDelete(g?.name)}
+                          disabled={deleting}
+                        >
+                          {deleting ? "Deleting..." : "Delete"}
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="text-center text-muted py-3">
+                      No Employee Groups Found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
