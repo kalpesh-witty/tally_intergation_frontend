@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../helper";
 
-function StockItemList() {
+function StockItemSummeryList() {
   const [list, setList] = useState([]);
   const [units, setUnits] = useState([]);
   const [formData, setFormData] = useState({
@@ -18,8 +18,8 @@ function StockItemList() {
   // Load Stock Items
   const loadStockItems = () => {
     axios
-      .get(`${apiUrl}/stock-items`)
-      .then((res) => setList(res.data.stockItems || []))
+      .get(`${apiUrl}/stock-summary`)
+      .then((res) => setList(res.data.stockSummary || []))
       .catch((err) => console.error("Failed to load stock items", err));
   };
 
@@ -242,4 +242,4 @@ function StockItemList() {
   );
 }
 
-export default StockItemList;
+export default StockItemSummeryList;

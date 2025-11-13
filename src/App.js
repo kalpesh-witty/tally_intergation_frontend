@@ -14,6 +14,11 @@ import GodownList from './pages/GodownList';
 import EmployeeCategoriesList from './pages/EmployeeCategoriesList';
 import EmployeeGroupList from './pages/EmployeeGroupList';
 import EmployeeList from './pages/EmployeeList';
+import TrialBalancePage from './pages/TrialBalancePage';
+import DayBookPage from './pages/DayBookPage';
+import PurchaseFormPage from './pages/PurchaseFormPage';
+import PurchaseHistoryPage from './pages/PurchaseHistoryPage';
+import ProfitAndLossPage from './pages/ProfitAndLossPage';
 // import ScenarioList from './pages/ScenarioList';
 
 function App() {
@@ -42,6 +47,27 @@ function App() {
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
                 <Link className="nav-link" to="/">Home</Link>
+              </li>
+
+               {/* Inventory Dropdown */}
+              <li className="nav-item dropdown">
+                <a
+                  href="#"
+                  className="nav-link dropdown-toggle"
+                  id="displayDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  Display
+                </a>
+                <ul className="dropdown-menu" aria-labelledby="displayDropdown">
+                  <li><Link className="dropdown-item" to="/trial-balance">Trial Balance</Link></li>
+                  <li><Link className="dropdown-item" to="/day-book">Day Book</Link></li>
+                  <li><Link className="dropdown-item" to="/purchase-page">Purchase Order</Link></li>
+                  <li><Link className="dropdown-item" to="/purchase-history">Purchase History</Link></li>
+                  <li><Link className="dropdown-item" to="/profit-loss-page">Profit & Loss A/C</Link></li>
+                </ul>
               </li>
 
               {/* Masters Dropdown */}
@@ -126,6 +152,11 @@ function App() {
           <Route path="/employee-categories" element={<EmployeeCategoriesList />} />
           <Route path="/employees" element={<EmployeeList />} />
           <Route path="/employee-groups" element={<EmployeeGroupList />} />
+          <Route path="/trial-balance" element={<TrialBalancePage />} />
+          <Route path="/day-book" element={<DayBookPage />} />
+          <Route path="/purchase-page" element={<PurchaseFormPage />} />
+          <Route path="/purchase-history" element={<PurchaseHistoryPage />} />
+          <Route path="/profit-loss-page" element={<ProfitAndLossPage />} />
           {/* <Route path="/scenarios" element={<ScenarioList />} /> */}
         </Routes>
       </div>

@@ -92,16 +92,14 @@ function StockGroupList() {
                 <tr>
                   <th style={{ width: "5%" }}>#</th>
                   <th>Stock Group Name</th>
-                  <th>Under</th>
                 </tr>
               </thead>
               <tbody>
                 {groups?.length > 0 ? (
-                  groups.map((g, idx) => (
+                  groups?.map((g, idx) => (
                     <tr key={idx}>
                       <td>{idx + 1}</td>
                       <td>{g?.name}</td>
-                      <td>{g?.parent || "Primary"}</td>
                     </tr>
                   ))
                 ) : (
