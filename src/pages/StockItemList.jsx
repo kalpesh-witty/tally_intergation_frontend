@@ -206,7 +206,9 @@ function StockItemList() {
                   <td>{l?.baseUnits || "-"}</td>
                   <td>{l?.openingBalance || "0"}</td>
                   <td>{l?.openingRate || "0"}</td>
-                  <td>{l?.openingValue || "0"}</td>
+                  <td>{parseFloat(-l?.openingValue || 0).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}</td>
                   <td>
                     <button
                       className="btn btn-sm btn-danger"
