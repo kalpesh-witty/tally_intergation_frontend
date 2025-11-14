@@ -7,6 +7,7 @@ function DayBookPage() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [voucherType, setVoucherType] = useState("All");
   const [total, setTotal] = useState(0);
 
   const loadDayBook = async () => {
@@ -15,6 +16,7 @@ function DayBookPage() {
       const params = {};
       if (from) params.from = from;
       if (to) params.to = to;
+      if (voucherType !== "All") params.voucherType = voucherType;
 
       const res = await axios.get(`${apiUrl}/day-book`, { params });
       const data = res.data?.dayBook || [];
@@ -32,6 +34,7 @@ function DayBookPage() {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     loadDayBook();
@@ -73,6 +76,25 @@ function DayBookPage() {
             onChange={(e) => setTo(e.target.value)}
             disabled={loading}
           />
+        </div>
+        <div className="col-md-3">
+          <label className="form-label fw-semibold">Voucher Type</label>
+          <select
+            className="form-select"
+            value={voucherType}
+            onChange={(e) => setVoucherType(e.target.value)}
+            disabled={loading}
+          >
+            <option value="All">All</option>
+            <option value="Purchase Order">Purchase Order</option>
+            <option value="Receipt Note">Receipt Note</option>
+            <option value="Payment">Payment</option>
+            <option value="Purchase">Purchase</option>
+            <option value="Sales Order">Sales Order</option>
+            <option value="Delivery Note">Delivery Note</option>
+            <option value="Sales">Sales</option>
+            <option value="Receipt">Receipt</option>
+          </select>
         </div>
         <div className="col-md-2">
           <button

@@ -77,7 +77,7 @@ function EmployeeList() {
       <h3 className="fw-bold text-primary mb-4">Employee List</h3>
 
       {/* 🔹 Create Employee Form */}
-      <form onSubmit={handleSubmit} className="row g-2 align-items-center mb-4">
+      {/* <form onSubmit={handleSubmit} className="row g-2 align-items-center mb-4">
         <div className="col-md-10">
           <input
             type="text"
@@ -98,7 +98,7 @@ function EmployeeList() {
             {loading ? "Creating..." : "Create Employee"}
           </button>
         </div>
-      </form>
+      </form> */}
 
       {/* 🔹 Employee Table */}
       <div className="card shadow-sm">

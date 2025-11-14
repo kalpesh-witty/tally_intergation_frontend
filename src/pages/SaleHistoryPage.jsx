@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../helper";
 
-function PurchaseHistoryPage() {
-  const [purchases, setPurchases] = useState([]);
+function SaleHistoryPage() {
+  const [sales, setSales] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null);
 
-  // Load purchase history
-  const loadPurchases = async () => {
+  // Load sales history
+  const loadSales = async () => {
     try {
-      const res = await axios.get(`${apiUrl}/purchase-history`);
-      setPurchases(res.data.purchases || []);
+      const res = await axios.get(`${apiUrl}/sales-history`);
+      setSales(res.data.sales || []);
     } catch (err) {
       console.error(err);
-      alert("Failed to load purchase history");
+      alert("Failed to load sales history");
     }
   };
 
   // Auto-load on page load
   useEffect(() => {
-    loadPurchases();
+    loadSales();
   }, []);
 
   // Toggle expand row
@@ -35,8 +35,7 @@ function PurchaseHistoryPage() {
 
   return (
     <div className="container mt-4">
-      <h3 className="fw-bold text-primary mb-4">Purchase History</h3>
-
+      <h3 className="fw-bold text-success mb-4">Sales History</h3>
       {/* Table */}
       <div className="card shadow-sm">
         <div className="card-body">
@@ -54,9 +53,9 @@ function PurchaseHistoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {purchases.length > 0 ? (
-                  purchases.map((p, idx) => {
-                    const total = p.items.reduce(
+                {sales.length > 0 ? (
+                  sales.map((s, idx) => {
+                    const total = s.items.reduce(
                       (sum, i) => sum + Math.abs(parseFloat(i.amount || 0)),
                       0
                     );
@@ -64,10 +63,10 @@ function PurchaseHistoryPage() {
                       <>
                         <tr key={idx}>
                           <td>{idx + 1}</td>
-                          <td>{formatDate(p.date)}</td>
-                          <td>{p.voucherNumber}</td>
-                          <td>{p.orderNo}</td>
-                          <td>{p.partyName}</td>
+                          <td>{formatDate(s.date)}</td>
+                          <td>{s.voucherNumber}</td>
+                          <td>{s.orderNo}</td>
+                          <td>{s.partyName}</td>
                           <td>₹ {total.toFixed(2)}</td>
                           <td>
                             <button
@@ -97,14 +96,19 @@ function PurchaseHistoryPage() {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {p.items.map((i, iidx) => (
+                                    {s.items.map((i, iidx) => (
                                       <tr key={iidx}>
                                         <td>{i.stockItem}</td>
                                         <td>{i.quantity}</td>
                                         <td>{i.rate}</td>
-                                        <td>{parseFloat(-i.amount || 0).toLocaleString("en-IN", {
-                                          minimumFractionDigits: 2,
-                                        })}</td>
+                                        <td>
+                                          {parseFloat(i.amount || 0).toLocaleString(
+                                            "en-IN",
+                                            {
+                                              minimumFractionDigits: 2,
+                                            }
+                                          )}
+                                        </td>
                                       </tr>
                                     ))}
                                   </tbody>
@@ -119,7 +123,7 @@ function PurchaseHistoryPage() {
                 ) : (
                   <tr>
                     <td colSpan="7" className="text-center text-muted py-3">
-                      No Purchase Records Found
+                      No Sales Records Found
                     </td>
                   </tr>
                 )}
@@ -132,4 +136,4 @@ function PurchaseHistoryPage() {
   );
 }
 
-export default PurchaseHistoryPage;
+export default SaleHistoryPage;

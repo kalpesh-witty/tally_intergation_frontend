@@ -8,7 +8,7 @@ import GroupList from './pages/GroupList';
 import CurrencyList from './pages/CurrencyList';
 import VoucherTypeList from './pages/VoucherTypeList';
 import StockCategoryList from './pages/StockCategoryList';
-import BudgetList from './pages/BudgetList';
+// import BudgetList from './pages/BudgetList';
 import StockGroupList from './pages/StockGroupList';
 import GodownList from './pages/GodownList';
 import EmployeeCategoriesList from './pages/EmployeeCategoriesList';
@@ -19,6 +19,9 @@ import DayBookPage from './pages/DayBookPage';
 import PurchaseFormPage from './pages/PurchaseFormPage';
 import PurchaseHistoryPage from './pages/PurchaseHistoryPage';
 import ProfitAndLossPage from './pages/ProfitAndLossPage';
+import StockSummaryPage from './pages/StockSummaryPage';
+import SaleHistoryPage from './pages/SaleHistoryPage';
+import SaleFormPage from './pages/SaleFormPage';
 // import ScenarioList from './pages/ScenarioList';
 
 function App() {
@@ -65,7 +68,9 @@ function App() {
                   <li><Link className="dropdown-item" to="/trial-balance">Trial Balance</Link></li>
                   <li><Link className="dropdown-item" to="/day-book">Day Book</Link></li>
                   <li><Link className="dropdown-item" to="/purchase-page">Purchase Order</Link></li>
+                  <li><Link className="dropdown-item" to="/sale-page">Sale Order</Link></li>
                   <li><Link className="dropdown-item" to="/purchase-history">Purchase History</Link></li>
+                  <li><Link className="dropdown-item" to="/sales-history">Sales History</Link></li>
                   <li><Link className="dropdown-item" to="/profit-loss-page">Profit & Loss A/C</Link></li>
                 </ul>
               </li>
@@ -87,7 +92,7 @@ function App() {
                   <li><Link className="dropdown-item" to="/ledgers">Ledgers</Link></li>
                   <li><Link className="dropdown-item" to="/units">Units</Link></li>
                   <li><Link className="dropdown-item" to="/voucher-types">Voucher Types</Link></li>
-                  <li><Link className="dropdown-item" to="/budgets">Budgets</Link></li>
+                  {/* <li><Link className="dropdown-item" to="/budgets">Budgets</Link></li> */}
                   {/* <li><Link className="dropdown-item" to="/currency">Currency</Link></li> */}
                 </ul>
               </li>
@@ -106,9 +111,10 @@ function App() {
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="inventoryDropdown">
                   <li><Link className="dropdown-item" to="/stock-items">Stock Items</Link></li>
-                  <li><Link className="dropdown-item" to="/stock-groups">Stock Groups</Link></li>
-                  <li><Link className="dropdown-item" to="/stock-categories">Stock Categories</Link></li>
-                  <li><Link className="dropdown-item" to="/godowns">Godowns</Link></li>
+                  <li><Link className="dropdown-item" to="/stock-summery">Stock Summery</Link></li>
+                  {/* <li><Link className="dropdown-item" to="/stock-groups">Stock Groups</Link></li> */}
+                  {/* <li><Link className="dropdown-item" to="/stock-categories">Stock Categories</Link></li> */}
+                  {/* <li><Link className="dropdown-item" to="/godowns">Godowns</Link></li> */}
                 </ul>
               </li>
 
@@ -125,7 +131,7 @@ function App() {
                   Employees
                 </a>
                 <ul className="dropdown-menu" aria-labelledby="employeeDropdown">
-                  <li><Link className="dropdown-item" to="/employee-categories">Employee Categories</Link></li>
+                  {/* <li><Link className="dropdown-item" to="/employee-categories">Employee Categories</Link></li> */}
                   <li><Link className="dropdown-item" to="/employee-groups">Employee Groups</Link></li>
                   <li><Link className="dropdown-item" to="/employees">Employee List</Link></li>
                 </ul>
@@ -146,7 +152,7 @@ function App() {
           <Route path="/units" element={<UnitList />} />
           <Route path="/voucher-types" element={<VoucherTypeList />} />
           <Route path="/stock-categories" element={<StockCategoryList />} />
-          <Route path="/budgets" element={<BudgetList />} />
+          {/* <Route path="/budgets" element={<BudgetList />} /> */}
           <Route path="/stock-groups" element={<StockGroupList />} />
           <Route path="/godowns" element={<GodownList />} />
           <Route path="/employee-categories" element={<EmployeeCategoriesList />} />
@@ -155,8 +161,11 @@ function App() {
           <Route path="/trial-balance" element={<TrialBalancePage />} />
           <Route path="/day-book" element={<DayBookPage />} />
           <Route path="/purchase-page" element={<PurchaseFormPage />} />
+          <Route path="/sale-page" element={<SaleFormPage />} />
           <Route path="/purchase-history" element={<PurchaseHistoryPage />} />
+          <Route path="/sales-history" element={<SaleHistoryPage />} />
           <Route path="/profit-loss-page" element={<ProfitAndLossPage />} />
+          <Route path="/stock-summery" element={<StockSummaryPage />} />
           {/* <Route path="/scenarios" element={<ScenarioList />} /> */}
         </Routes>
       </div>

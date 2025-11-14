@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl } from "../helper";
 
-function PurchaseFormPage() {
+function SaleFormPage() {
   const [form, setForm] = useState({
     supplier: "",
     purchaseLedger: "",
@@ -82,8 +82,8 @@ function PurchaseFormPage() {
 
     setLoading(true);
     try {
-      await axios.post(`${apiUrl}/create-purchase`, form);
-      alert("Purchase voucher created successfully!");
+      await axios.post(`${apiUrl}/create-sale`, form);
+      alert("Sales voucher created successfully!");
       setForm({
         supplier: "",
         purchaseLedger: "",
@@ -95,7 +95,7 @@ function PurchaseFormPage() {
       });
     } catch (err) {
       console.error(err);
-      alert("Failed to create purchase voucher");
+      alert("Failed to create Sales voucher");
     } finally {
       setLoading(false);
     }
@@ -106,11 +106,11 @@ function PurchaseFormPage() {
       .get(`${apiUrl}/ledgers`)
       .then((res) => {
         const filtered = res.data.ledgers.filter(
-          (ledger) => ledger.parent === "Sundry Creditors"
+          (ledger) => ledger.parent === "Sundry Creditors" || ledger.parent === 'Sundry Debtors'
         );
         setLedgers(filtered);
         const purchasefiltered = res.data.ledgers.filter(
-          (ledger) => ledger.parent === "Purchase Accounts"
+          (ledger) => ledger.parent === "Sales Accounts"
         );
         setPurchaseLedgers(purchasefiltered)
       })
@@ -131,12 +131,12 @@ function PurchaseFormPage() {
 
   return (
     <div className="container mt-4">
-      <h3 className="fw-bold text-primary mb-4">Create Purchase Voucher</h3>
+      <h3 className="fw-bold text-primary mb-4">Create Sale Voucher</h3>
 
       <form onSubmit={handleSubmit} className="card shadow-sm p-4">
         <div className="row">
           <div className="col-md-4 mb-3">
-            <label className="form-label fw-semibold">Purchase Order No.*</label>
+            <label className="form-label fw-semibold">Sales Order No.*</label>
             <input
               type="text"
               className="form-control"
@@ -186,7 +186,7 @@ function PurchaseFormPage() {
           </div>
 
           <div className="col-md-4 mb-3">
-            <label className="form-label fw-semibold">Purchase Ledger*</label>
+            <label className="form-label fw-semibold">Sale Ledger*</label>
             <select
               className="form-select w-100"
               value={form.purchaseLedger}
@@ -194,7 +194,7 @@ function PurchaseFormPage() {
               disabled={loading}
               required
             >
-              <option value="">Select Purchase Ledger</option>
+              <option value="">Select Sale Ledger</option>
               {purchaseLedgers.map((g, idx) => (
                 <option key={idx} value={g.name}>
                   {g.name}
@@ -315,7 +315,7 @@ function PurchaseFormPage() {
             className="btn btn-success px-4"
             disabled={loading}
           >
-            {loading ? "Saving..." : "Save Purchase"}
+            {loading ? "Saving..." : "Save Sales"}
           </button>
         </div>
       </form>
@@ -323,4 +323,4 @@ function PurchaseFormPage() {
   );
 }
 
-export default PurchaseFormPage;
+export default SaleFormPage;
